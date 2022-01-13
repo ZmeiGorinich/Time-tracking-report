@@ -6,6 +6,8 @@
 #include <iomanip>
 #include <cstdlib>
 
+#include "LoggerClass.hpp"
+
 using namespace std;
 
 struct Data
@@ -21,26 +23,25 @@ struct Data
 
 };
 
-void writeLog(string a, bool end = false) {
-	ofstream file;
-	file.open("log.txt"
-		, std::ios::app
-	);
+//class Singleton {
+//	Singleton() {
+//		// Thread-unsafe code
+//	}
+//	static Singleton* getInstance() {
+//		static Singleton instance;
+//		return &instance;
+//	}
+//};
 
 
-	errno_t err;
-	struct tm time_info;
-	time_t time_create = time(0);
-	localtime_s(&time_info, &time_create);
-	char timebuf[26];
-	err = asctime_s(timebuf, 26, &time_info);
 
-	file << a << "  " << (end ? "\n" : timebuf);
-	file.close();
-}
+
+
 
 vector<Data> getReport(vector<Data>& strings) {
-	writeLog("Start method getReport          ");
+	
+	Logging::LoggerSingleton::Instance().WriteLine("Start method getReport          ", false);
+
 	for (int i = 0; i < strings.size(); i++) {
 
 		for (int j = 0; j < strings.size(); ++j)
@@ -52,13 +53,16 @@ vector<Data> getReport(vector<Data>& strings) {
 			}
 		}
 	}
-	writeLog("Method getReport completed      ");
+
+	Logging::LoggerSingleton::Instance().WriteLine("Method getReport completed      ", false);
 
 	return strings;
 }
 
 vector<Data> stringToStruct(vector<string> strings) {
-	writeLog("Start method stringToStruct     ");
+
+	Logging::LoggerSingleton::Instance().WriteLine("Start method stringToStruct     ", false);
+
 	vector<Data> info;
 
 	for (size_t i = 0; i < strings.size(); i++)
@@ -80,7 +84,8 @@ vector<Data> stringToStruct(vector<string> strings) {
 
 		info.push_back({ b[0],b[1] ,b[2] ,b[3] ,b[4] ,b[5] ,b[6].erase(b[6].size() - 3),stoi(b[7]) });
 	}
-	writeLog("Method stringToStruct completed ");
+
+	Logging::LoggerSingleton::Instance().WriteLine("Method stringToStruct completed ", false);
 
 	return info;
 }
@@ -119,7 +124,8 @@ vector<string> readFile() {
 
 	string a;
 
-	writeLog("Opening file for reading        ");
+	Logging::LoggerSingleton::Instance().WriteLine("Start method getReport          ", false);
+
 
 	ifstream file("db.csv");
 	if (file)
@@ -135,18 +141,18 @@ vector<string> readFile() {
 
 		cout << "File reading took " << search_time / 1000 << " sec" << endl;
 
-		writeLog("Reading completed               ");
+		Logging::LoggerSingleton::Instance().WriteLine("Reading completed               ", false);
 
 		file.close();
 
-		writeLog("Closing the file after reading  ");
+		Logging::LoggerSingleton::Instance().WriteLine("Closing the file after reading  ", false);
 
 		strings.erase(strings.begin());
 
-
 	}
 	else {
-		writeLog("File open error                 ");
+		Logging::LoggerSingleton::Instance().WriteLine("File open error                 ", false);
+
 		cout << "File open error" << endl;
 	}
 	return strings;
@@ -156,7 +162,7 @@ void writeReport(vector<Data>& report) {
 
 	ofstream file;
 
-	writeLog("Opening file for recording      ");
+	Logging::LoggerSingleton::Instance().WriteLine("Opening file for recording      ", false);
 
 	file.open("report.csv");
 
@@ -164,7 +170,8 @@ void writeReport(vector<Data>& report) {
 	{
 		file << report[i].name << ";" << date(report[i].date) << ";" << report[i].logged_hours << endl;
 	}
-	writeLog("Closing the file after recording");
+
+	Logging::LoggerSingleton::Instance().WriteLine("Closing the file after recording", false);
 
 	file.close();
 
@@ -182,18 +189,22 @@ int main()
 	if (!strings.empty())
 	{
 		info = stringToStruct(strings);
+
 		getReport(info);
 
 		writeReport(info);
 
-		writeLog("Program successfully completed  ");
+		Logging::LoggerSingleton::Instance().WriteLine("Program successfully completed  ", false);
+
 	}
 	else
 	{
-		writeLog("Program terminated with an error");
+		Logging::LoggerSingleton::Instance().WriteLine("Program terminated with an error", false);
+
 	}
 
-	writeLog("//////////////////////////////////////////////////////////", true);
+	Logging::LoggerSingleton::Instance().WriteLine("//////////////////////////////////////////////////////////",true);
+
 
 	cout << "Program execution time " << clock() / 1000 << " sec";
 
